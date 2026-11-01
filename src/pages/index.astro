@@ -15,11 +15,14 @@ const allTags = [...new Set(sortedPosts.flatMap((post) => post.data.tags || []))
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-backdrop">
-      <img
-        src="/images/gemini_generated_image_lzmeqxlzmeqxlzme.png"
-        alt="Hack the Byte Workstation"
-        class="hero-img"
-      />
+      <picture>
+        <source srcset="/images/hacker-lab-banner.webp" type="image/webp" />
+        <img
+          src="/images/hacker-lab-banner.png"
+          alt="Hack the Byte Hacker Lab Workstation"
+          class="hero-img"
+        />
+      </picture>
       <div class="hero-overlay"></div>
     </div>
 
@@ -31,8 +34,8 @@ const allTags = [...new Set(sortedPosts.flatMap((post) => post.data.tags || []))
         Descifrando la seguridad, <br /><span class="title-highlight">byte a byte</span>
       </h1>
       <p class="hero-description">
-        Espacio técnico de ciberseguridad enfocado en análisis de vulnerabilidades,
-        técnicas de evasión perimetral, writeups ofensivos sin Metasploit y detección en SOC con Suricata y Zeek.
+        Espacio donde la ciberseguridad se encuentra con el conocimiento práctico:
+        análisis de vulnerabilidades, técnicas de evasión perimetral, writeups ofensivos sin Metasploit y detección en SOC.
       </p>
 
       <div class="hero-stats">
@@ -46,7 +49,7 @@ const allTags = [...new Set(sortedPosts.flatMap((post) => post.data.tags || []))
         </div>
         <div class="stat-pill">
           <span class="stat-icon">⚡</span>
-          <span class="stat-label">Edge CDN Fast</span>
+          <span class="stat-label">Cloudflare Edge Fast</span>
         </div>
       </div>
     </div>
@@ -90,7 +93,7 @@ const allTags = [...new Set(sortedPosts.flatMap((post) => post.data.tags || []))
             <a href={`/posts/${slug}`} class="card-image-link">
               <div class="card-image-wrap">
                 <img
-                  src={post.data.heroImage || '/images/gemini_generated_image_lzmeqxlzmeqxlzme.png'}
+                  src={post.data.heroImage || '/images/hacker-lab-banner.webp'}
                   alt={post.data.title}
                   loading="lazy"
                   class="card-image"
@@ -134,7 +137,7 @@ const allTags = [...new Set(sortedPosts.flatMap((post) => post.data.tags || []))
   /* Hero Styles */
   .hero-section {
     position: relative;
-    padding: 5rem 1.5rem 4rem;
+    padding: 6.5rem 1.5rem 5.5rem;
     overflow: hidden;
     background: #0a0c10;
     border-bottom: 1px solid var(--border-color);
@@ -154,8 +157,8 @@ const allTags = [...new Set(sortedPosts.flatMap((post) => post.data.tags || []))
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%;
-    filter: brightness(0.35) contrast(1.15);
+    object-position: center 35%;
+    filter: brightness(0.72) contrast(1.1);
   }
 
   .hero-overlay {
@@ -163,8 +166,8 @@ const allTags = [...new Set(sortedPosts.flatMap((post) => post.data.tags || []))
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(10, 12, 16, 0.4) 0%,
-      rgba(10, 12, 16, 0.85) 70%,
+      rgba(10, 12, 16, 0.2) 0%,
+      rgba(10, 12, 16, 0.5) 60%,
       #0a0c10 100%
     );
   }
