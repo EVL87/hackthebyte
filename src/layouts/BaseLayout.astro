@@ -1,0 +1,413 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  articleDate?: string;
+}
+
+const {
+  title = "Hack the Byte | Ciberseguridad, Red Team & Blue Team",
+  description = "Descifrando la seguridad, byte a byte. Análisis de vulnerabilidades, técnicas de evasión, writeups y estrategias de defensa digital.",
+  image = "/images/gemini_generated_image_lzmeqxlzmeqxlzme.png",
+  articleDate,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://hkthebyte.com");
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO & Metadata -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content={articleDate ? "article" : "website"} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, canonicalURL)} />
+    {articleDate && <meta property="article:published_time" content={articleDate} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, canonicalURL)} />
+
+    <!-- Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style is:global>
+      :root {
+        --bg-main: #0a0c10;
+        --bg-surface: #12161f;
+        --bg-surface-hover: #181e2b;
+        --border-color: #212634;
+        --border-color-glow: rgba(239, 68, 68, 0.3);
+        
+        --accent-red: #ef4444;
+        --accent-red-hover: #dc2626;
+        --accent-crimson: #e11d48;
+        --accent-cyan: #38bdf8;
+        --accent-green: #10b981;
+
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        line-height: 1.65;
+        font-size: 16px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      /* Global Header */
+      .site-header {
+        background-color: rgba(10, 12, 16, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .brand-logo {
+        font-family: var(--font-mono);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .terminal-prompt {
+        color: var(--accent-red);
+        text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+      }
+
+      .brand-badge {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        padding: 0.15rem 0.5rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .brand-tagline {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .brand-tagline {
+          display: inline-block;
+          border-left: 1px solid var(--border-color);
+          padding-left: 0.75rem;
+        }
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: #ffffff;
+      }
+
+      .nav-cta {
+        background: linear-gradient(135deg, #ef4444, #e11d48);
+        color: #ffffff !important;
+        padding: 0.45rem 1rem;
+        border-radius: 6px;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        box-shadow: 0 2px 10px rgba(239, 68, 68, 0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .nav-cta:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+      }
+
+      /* Main container */
+      main {
+        flex: 1;
+        width: 100%;
+      }
+
+      /* Global Footer */
+      .site-footer {
+        background-color: var(--bg-surface);
+        border-top: 1px solid var(--border-color);
+        padding: 3rem 1.5rem;
+        margin-top: 4rem;
+      }
+
+      .footer-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      @media (min-width: 768px) {
+        .footer-container {
+          grid-template-columns: 2fr 1fr 1fr;
+        }
+      }
+
+      .footer-brand h4 {
+        font-family: var(--font-mono);
+        color: #ffffff;
+        font-size: 1.15rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .footer-brand p {
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+        line-height: 1.6;
+        max-width: 420px;
+      }
+
+      .footer-col h5 {
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .footer-col ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .footer-col a {
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+      }
+
+      .footer-col a:hover {
+        color: var(--accent-red);
+      }
+
+      .footer-bottom {
+        max-width: 1280px;
+        margin: 2.5rem auto 0;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
+
+      @media (min-width: 640px) {
+        .footer-bottom {
+          flex-direction: row;
+        }
+      }
+
+      .security-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: var(--font-mono);
+        color: var(--accent-green);
+        background: rgba(16, 185, 129, 0.1);
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-container">
+        <div class="brand">
+          <a href="/" class="brand-logo">
+            <span class="terminal-prompt">&gt;_</span> Hack the Byte
+          </a>
+          <span class="brand-badge">Sec Research</span>
+          <span class="brand-tagline">Descifrando la seguridad, byte a byte</span>
+        </div>
+
+        <nav>
+          <ul class="nav-links">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/articulos">Artículos</a></li>
+            <li>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="nav-cta"
+              >
+                GitHub
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <h4><span class="terminal-prompt">&gt;_</span> Hack the Byte</h4>
+          <p>
+            Publicación especializada en ciberseguridad, evasión de controles perimetrales,
+            análisis de vectores de ataque, writeups de laboratorios técnicos y hardening defensivo.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Navegación</h5>
+          <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/articulos">Todos los Artículos</a></li>
+            <li><a href="/articulos?tag=Red+Team">Red Team & Evasión</a></li>
+            <li><a href="/articulos?tag=Blue+Team">Blue Team & SOC</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Arquitectura</h5>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Sitio estático de ataque nulo. Compilado con Astro y servido desde Edge CDN global.
+          </p>
+          <div class="security-pill">
+            ● 0 PHP | 0 MySQL | 0 Inyecciones
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2026 <strong>Hack the Byte</strong> por <strong>EVLBYTE</strong>. Todos los derechos reservados.
+        </div>
+        <div>
+          Desplegado en red perimetral Cloudflare Edge.
+        </div>
+      </div>
+    </footer>
+
+    <!-- Copy code block script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("pre").forEach((pre) => {
+          if (pre.querySelector(".copy-btn")) return;
+          const button = document.createElement("button");
+          button.className = "copy-btn";
+          button.innerText = "Copiar";
+          button.setAttribute("aria-label", "Copiar código");
+
+          button.addEventListener("click", async () => {
+            const code = pre.querySelector("code")?.innerText || pre.innerText;
+            try {
+              await navigator.clipboard.writeText(code);
+              button.innerText = "¡Copiado!";
+              button.classList.add("copied");
+              setTimeout(() => {
+                button.innerText = "Copiar";
+                button.classList.remove("copied");
+              }, 2000);
+            } catch (err) {
+              console.error("Error al copiar:", err);
+            }
+          });
+
+          pre.style.position = "relative";
+          pre.appendChild(button);
+        });
+      });
+    </script>
+  </body>
+</html>

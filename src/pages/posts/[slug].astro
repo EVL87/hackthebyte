@@ -1,0 +1,521 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/\.(md|mdx)$/, '') },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+// Filter h2 and h3 for Table of Contents
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+// Estimate reading time
+const wordCount = (post.body || '').split(/\s+/).length || 600;
+const readTimeMin = Math.max(3, Math.ceil(wordCount / 200));
+
+const formattedDate = post.data.pubDate.toLocaleDateString('es-ES', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout
+  title={`${post.data.title} | Hack the Byte`}
+  description={post.data.description}
+  image={post.data.heroImage}
+  articleDate={post.data.pubDate.toISOString()}
+>
+  <article class="article-wrapper">
+    <!-- Breadcrumbs & Meta Top -->
+    <header class="article-header">
+      <div class="header-inner">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="/">Inicio</a>
+          <span class="separator">/</span>
+          <a href="/articulos">Artículos</a>
+          <span class="separator">/</span>
+          <span class="current">Investigación</span>
+        </nav>
+
+        <div class="article-meta-row">
+          <span class="category-badge">{post.data.category || 'Ciberseguridad'}</span>
+          <span class="meta-item">
+            📅 <time datetime={post.data.pubDate.toISOString()}>{formattedDate}</time>
+          </span>
+          <span class="meta-item">⏱️ {readTimeMin} min de lectura</span>
+          <span class="meta-item">👤 Por <strong>{post.data.author || 'EVLBYTE'}</strong></span>
+        </div>
+
+        <h1 class="article-title">{post.data.title}</h1>
+
+        <p class="article-lead">{post.data.description}</p>
+
+        <div class="article-tags-header">
+          {(post.data.tags || []).map((tag: string) => (
+            <span class="tag-pill">#{tag}</span>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <!-- 2-Column Content Layout -->
+    <div class="article-body-container">
+      <!-- Main Content Column -->
+      <main class="article-content-main">
+        <div class="prose-hacker">
+          <Content />
+        </div>
+
+        <!-- Article Footer / Author Bio -->
+        <div class="article-footer-box">
+          <div class="author-bio">
+            <div class="author-avatar">🛡️</div>
+            <div class="author-info">
+              <h4>Publicado por {post.data.author || 'EVLBYTE'}</h4>
+              <p>
+                Investigador de seguridad informática, red teamer y analista de evasión de defensas.
+                Especializado en técnicas ofensivas en laboratorio y mitigación en SOC.
+              </p>
+            </div>
+          </div>
+          <div class="back-link-wrap">
+            <a href="/" class="back-home-btn">← Volver al Inicio</a>
+          </div>
+        </div>
+      </main>
+
+      <!-- Sticky Sidebar (Table of Contents & Quick Links) -->
+      <aside class="article-sidebar">
+        {tocHeadings.length > 0 && (
+          <div class="toc-card sticky-sidebar">
+            <h3 class="toc-title">
+              <span>📑</span> Índice de Contenidos
+            </h3>
+            <nav class="toc-nav">
+              <ul class="toc-list">
+                {tocHeadings.map((h) => (
+                  <li class={`toc-item depth-${h.depth}`}>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div class="toc-footer">
+              <a href="#" class="top-jump-btn" id="back-to-top">
+                ↑ Subir al inicio
+              </a>
+            </div>
+          </div>
+        )}
+      </aside>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article-wrapper {
+    width: 100%;
+  }
+
+  /* Article Header */
+  .article-header {
+    background: linear-gradient(180deg, #121722 0%, #0a0c10 100%);
+    border-bottom: 1px solid var(--border-color);
+    padding: 3.5rem 1.5rem 2.5rem;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-bottom: 1.25rem;
+  }
+
+  .breadcrumbs a:hover {
+    color: var(--accent-red);
+  }
+
+  .separator {
+    color: var(--border-color);
+  }
+
+  .current {
+    color: var(--text-secondary);
+  }
+
+  .article-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    margin-bottom: 1.25rem;
+  }
+
+  .category-badge {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+    padding: 0.2rem 0.65rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .article-title {
+    font-size: clamp(2rem, 3.5vw + 1rem, 3rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+  }
+
+  .article-lead {
+    font-size: 1.15rem;
+    line-height: 1.65;
+    color: #94a3b8;
+    max-width: 900px;
+    margin-bottom: 1.75rem;
+  }
+
+  .article-tags-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag-pill {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    background: #18202d;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+  }
+
+  /* Body Container: 2-column layout on desktop */
+  .article-body-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .article-body-container {
+      grid-template-columns: minmax(0, 1fr) 320px;
+    }
+  }
+
+  /* Sidebar */
+  .article-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .sticky-sidebar {
+    position: sticky;
+    top: 5.5rem;
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+  }
+
+  .toc-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .toc-title {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    font-size: 0.88rem;
+  }
+
+  .toc-item a {
+    color: var(--text-secondary);
+    display: block;
+    line-height: 1.4;
+    transition: color 0.15s ease, transform 0.15s ease;
+  }
+
+  .toc-item a:hover {
+    color: var(--accent-red);
+    transform: translateX(3px);
+  }
+
+  .toc-item.depth-3 {
+    padding-left: 1rem;
+    font-size: 0.82rem;
+    opacity: 0.9;
+  }
+
+  .toc-footer {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .top-jump-btn {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: inline-block;
+  }
+
+  .top-jump-btn:hover {
+    color: var(--accent-red);
+  }
+
+  /* Prose Styling */
+  .prose-hacker {
+    color: #cbd5e1;
+    font-size: 1.08rem;
+    line-height: 1.8;
+  }
+
+  .prose-hacker :global(h2) {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 2.75rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.015em;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    scroll-margin-top: 6rem;
+  }
+
+  .prose-hacker :global(h3) {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    scroll-margin-top: 6rem;
+  }
+
+  .prose-hacker :global(p) {
+    margin-bottom: 1.5rem;
+  }
+
+  .prose-hacker :global(ul),
+  .prose-hacker :global(ol) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.75rem;
+  }
+
+  .prose-hacker :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose-hacker :global(a) {
+    color: var(--accent-cyan);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose-hacker :global(a:hover) {
+    color: #7dd3fc;
+  }
+
+  .prose-hacker :global(blockquote) {
+    border-left: 4px solid var(--accent-red);
+    padding: 0.75rem 1.25rem;
+    margin: 1.75rem 0;
+    background: rgba(239, 68, 68, 0.05);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #e2e8f0;
+  }
+
+  .prose-hacker :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin: 1.5rem auto;
+    display: block;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .prose-hacker :global(pre) {
+    background-color: #12161f !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem !important;
+    margin: 1.75rem 0 !important;
+    overflow-x: auto;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    position: relative;
+  }
+
+  .prose-hacker :global(code) {
+    font-family: var(--font-mono) !important;
+  }
+
+  .prose-hacker :global(:not(pre) > code) {
+    background: #1e2433;
+    color: #f43f5e;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.88em;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .prose-hacker :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.75rem 0;
+    font-size: 0.95rem;
+  }
+
+  .prose-hacker :global(th),
+  .prose-hacker :global(td) {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+
+  .prose-hacker :global(th) {
+    background: var(--bg-surface);
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  /* Copy button styling */
+  :global(.copy-btn) {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #212634;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  :global(.copy-btn:hover) {
+    background: #2d3446;
+    color: #ffffff;
+  }
+
+  :global(.copy-btn.copied) {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #34d399;
+  }
+
+  /* Article Footer Box */
+  .article-footer-box {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .author-bio {
+    display: flex;
+    gap: 1.25rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .author-avatar {
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+
+  .author-info h4 {
+    color: #ffffff;
+    font-size: 1.05rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .author-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+
+  .back-link-wrap {
+    text-align: left;
+  }
+
+  .back-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: var(--accent-red);
+    font-weight: 600;
+  }
+
+  .back-home-btn:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<script>
+  // Smooth scroll for top jump
+  document.getElementById('back-to-top')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
